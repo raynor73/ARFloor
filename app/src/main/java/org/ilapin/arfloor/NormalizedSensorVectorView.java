@@ -7,7 +7,7 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.View;
 
-public class NormalizedVectorView extends View {
+public class NormalizedSensorVectorView extends View {
 	private final Paint mPaint = new Paint();
 	
 	private float mNormalizedX;
@@ -17,15 +17,15 @@ public class NormalizedVectorView extends View {
 	private float mPixelLength;
 	private PointF mViewCenter;
 	
-	public NormalizedVectorView(final Context context) {
+	public NormalizedSensorVectorView(final Context context) {
 		this(context, null);
 	}
 	
-	public NormalizedVectorView(final Context context, final AttributeSet attrs) {
+	public NormalizedSensorVectorView(final Context context, final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 	
-	public NormalizedVectorView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public NormalizedSensorVectorView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		
 		mPaint.setStrokeWidth(2);
@@ -42,7 +42,7 @@ public class NormalizedVectorView extends View {
 	public void setVector(final float x, final float y, final float z) {
 		final double length = Math.sqrt(x * x + y * y + z * z);
 		mNormalizedX = (float) (x / length);
-		mNormalizedY = (float) (y / length);
+		mNormalizedY = (float) (-y / length);
 		mNormalizedZ = (float) (z / length);
 		
 		invalidate();

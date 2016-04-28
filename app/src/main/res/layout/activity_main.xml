@@ -7,7 +7,7 @@
 	android:padding="32dp"
 	android:orientation="vertical">
 
-	<org.ilapin.arfloor.NormalizedVectorView
+	<org.ilapin.arfloor.NormalizedSensorVectorView
 		android:id="@+id/view_vector"
 		android:layout_width="200dp"
 		android:layout_height="200dp"

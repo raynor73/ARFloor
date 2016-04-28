@@ -7,18 +7,46 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Display;
+import android.view.Surface;
+import android.view.WindowManager;
 
 public class MainActivity extends AppCompatActivity {
 
 	private SensorManager mSensorManager;
-
-	private NormalizedVectorView mVectorView;
+	private Display mDisplay;
+	private NormalizedSensorVectorView mVectorView;
 
 	private final SensorEventListener mSensorListener = new SensorEventListener() {
 
 		@Override
 		public void onSensorChanged(final SensorEvent event) {
-			mVectorView.setVector(-event.values[0], event.values[1], event.values[2]);
+			final float sensorX;
+			final float sensorY;
+			switch (mDisplay.getRotation()) {
+				default:
+				case Surface.ROTATION_0:
+					sensorX = event.values[0];
+					sensorY = event.values[1];
+					break;
+
+				case Surface.ROTATION_90:
+					sensorX = -event.values[1];
+					sensorY = event.values[0];
+					break;
+				
+				case Surface.ROTATION_180:
+					sensorX = -event.values[0];
+					sensorY = -event.values[1];
+					break;
+				
+				case Surface.ROTATION_270:
+					sensorX = event.values[1];
+					sensorY = -event.values[0];
+					break;
+			}
+
+			mVectorView.setVector(sensorX, sensorY, event.values[2]);
 		}
 
 		@Override
@@ -26,14 +54,14 @@ public class MainActivity extends AppCompatActivity {
 			// do nothing
 		}
 	};
-	
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		mVectorView = (NormalizedVectorView) findViewById(R.id.view_vector);
-
+		mDisplay = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
+		mVectorView = (NormalizedSensorVectorView) findViewById(R.id.view_vector);
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 	}
 
