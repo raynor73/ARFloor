@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 					break;
 			}
 
-			mVectorView.setVector(sensorX, sensorY, event.values[2]);
+			mVectorView.setVector(-sensorX, -sensorY, -event.values[2]);
 		}
 
 		@Override

@@ -50,15 +50,15 @@ public class NormalizedSensorVectorView extends View {
 
 	@Override
 	protected void onDraw(final Canvas canvas) {
-		if (mNormalizedZ > 0) {
+		if (mNormalizedZ < 0) {
 			mPaint.setColor(0xff000080);
 		} else {
 			mPaint.setColor(0xff800000);
 		}
 		final float startX = mViewCenter.x;
 		final float startY = mViewCenter.y;
-		final float endX = startX - mNormalizedX * mLength;
-		final float endY = startY + mNormalizedY * mLength;
+		final float endX = startX + mNormalizedX * mLength;
+		final float endY = startY - mNormalizedY * mLength;
 		canvas.drawLine(startX, startY, endX, endY, mPaint);
 	}
 }
