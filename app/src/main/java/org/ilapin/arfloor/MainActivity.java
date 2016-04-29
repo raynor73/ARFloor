@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 
-		final Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mSensorManager.registerListener(mSensorListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+		final Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
+		mSensorManager.registerListener(mSensorListener, sensor, SensorManager.SENSOR_DELAY_UI);
 	}
 
 	@Override
