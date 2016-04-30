@@ -22,10 +22,10 @@ public class Plane implements Renderable {
 
 		final float halfSize = NUMBER_OF_SQUARES * SIZE_OF_SQUARE;
 		mVertices = new float[] {
-				-halfSize, -halfSize, 0,
-				halfSize, -halfSize, 0,
-				-halfSize, halfSize, 0,
-				halfSize, halfSize, 0
+				-halfSize, 0, -halfSize,
+				halfSize, 0, -halfSize,
+				-halfSize, 0, halfSize,
+				halfSize, 0, halfSize
 		};
 
 		final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(mVertices.length * SIZE_OF_FLOAT);
