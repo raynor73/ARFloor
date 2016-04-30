@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
 			@Override
 			public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
-				mScene.setCameraAngles(0, progress, 0);
+				mScene.setCameraAngles(new Coordinate3D(0, progress, 0));
 			}
 
 			@Override
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
 			@Override
 			public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
-				mScene.setCameraPosition(0, 0, progress);
+				mScene.setCameraPosition(new Coordinate3D(0, 0, progress));
 			}
 
 			@Override
@@ -163,7 +163,9 @@ public class MainActivity extends AppCompatActivity {
 
 		((ViewGroup) findViewById(R.id.view_content_container)).addView(glView);
 
-		mScene.addSceneObject(new Plane(new ColorMaterial(0xff008000)));
+		final Plane plane = new Plane(new ColorMaterial(0xff008000));
+		plane.setPositinon(new Coordinate3D(0, -10, 0));
+		mScene.addSceneObject(plane);
 	}
 
 	@Override

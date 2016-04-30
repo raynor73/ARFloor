@@ -13,6 +13,7 @@ public class Plane implements Renderable {
 	private static final int NUMBER_OF_VERTEX_COORDINATES = 3;
 
 	private Material mMaterial;
+	private Coordinate3D mPosition = new Coordinate3D();
 	private final float[] mVertices;
 	private final FloatBuffer mVertexBuffer;
 
@@ -34,16 +35,33 @@ public class Plane implements Renderable {
 		mVertexBuffer.position(0);
 	}
 
+	public Coordinate3D getPosition() {
+		return new Coordinate3D(mPosition);
+	}
+
+	public void setPositinon(final Coordinate3D position) {
+		mPosition = new Coordinate3D(position);
+	}
+
 	public void setMaterial(final Material material) {
 		mMaterial = material;
 	}
 
 	@Override
 	public void render() {
+		GLES11.glPushMatrix();
+		GLES11.glTranslatef(mPosition.getX(), mPosition.getY(), mPosition.getZ());
+
+		/*GLES11.glRotatef(viewAngleX, 1.0f, 0.0f, 0.0f);
+		GLES11.glRotatef(viewAngleY, 0.0f, 1.0f, 0.0f);
+		GLES11.glRotatef(viewAngleZ, 0.0f, 0.0f, 1.0f);*/
+
 		GLES11.glEnableClientState(GLES11.GL_VERTEX_ARRAY);
 		GLES11.glVertexPointer(NUMBER_OF_VERTEX_COORDINATES, GLES11.GL_FLOAT, 0, mVertexBuffer);
 		mMaterial.apply();
 		GLES11.glDrawArrays(GLES11.GL_TRIANGLE_STRIP, 0, mVertices.length / NUMBER_OF_VERTEX_COORDINATES);
 		GLES11.glDisableClientState(GLES11.GL_VERTEX_ARRAY);
+
+		GLES11.glPopMatrix();
 	}
 }

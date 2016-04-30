@@ -6,26 +6,17 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class Scene implements Renderable {
-	private volatile float mCameraAngleX;
-	private volatile float mCameraAngleY;
-	private volatile float mCameraAngleZ;
-	
-	private volatile float mCameraX;
-	private volatile float mCameraY;
-	private volatile float mCameraZ;
+	private volatile Coordinate3D mCameraAngles = new Coordinate3D();
+	private volatile Coordinate3D mCameraPosition = new Coordinate3D();
 
 	private final Set<Renderable> mSceneObjects = new CopyOnWriteArraySet<>();
 
-	public void setCameraAngles(final float x, final float y, final float z) {
-		mCameraAngleX = x;
-		mCameraAngleY = y;
-		mCameraAngleZ = z;
+	public void setCameraAngles(final Coordinate3D angles) {
+		mCameraAngles = new Coordinate3D(angles);
 	}
 	
-	public void setCameraPosition(final float x, final float y, final float z) {
-		mCameraX = x;
-		mCameraY = y;
-		mCameraZ = z;
+	public void setCameraPosition(final Coordinate3D position) {
+		mCameraPosition = new Coordinate3D(position);
 	}
 
 	public void addSceneObject(final Renderable sceneObject) {
@@ -34,20 +25,15 @@ public class Scene implements Renderable {
 
 	@Override
 	public void render() {
-		final float cameraX = mCameraX;
-		final float cameraY = mCameraY;
-		final float cameraZ = mCameraZ;
-		
-		final float cameraAngleX = mCameraAngleX;
-		final float cameraAngleY = mCameraAngleY;
-		final float cameraAngleZ = mCameraAngleZ;
-		
+		final Coordinate3D cameraAngles = new Coordinate3D(mCameraAngles);
+		final Coordinate3D cameraPosition = new Coordinate3D(mCameraPosition);
+
 		for (final Renderable renderable : mSceneObjects) {
 			GLES11.glLoadIdentity();
-			GLES11.glRotatef(-cameraAngleX, 1.0f, 0.0f, 0.0f);
-			GLES11.glRotatef(-cameraAngleY, 0.0f, 1.0f, 0.0f);
-			GLES11.glRotatef(-cameraAngleZ, 0.0f, 0.0f, 1.0f);
-			GLES11.glTranslatef(-cameraX, -cameraY, -cameraZ);
+			GLES11.glRotatef(-cameraAngles.getX(), 1.0f, 0.0f, 0.0f);
+			GLES11.glRotatef(-cameraAngles.getY(), 0.0f, 1.0f, 0.0f);
+			GLES11.glRotatef(-cameraAngles.getZ(), 0.0f, 0.0f, 1.0f);
+			GLES11.glTranslatef(-cameraPosition.getX(), -cameraPosition.getY(), -cameraPosition.getZ());
 
 			renderable.render();
 		}
