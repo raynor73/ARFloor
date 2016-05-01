@@ -33,11 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
 	private final SensorEventListener mSensorListener = new SensorEventListener() {
 		private final Vector3D mI = new Vector3D(1, 0, 0);
-		private final Vector3D mJ = new Vector3D(0, 1, 0);
-		private final Vector3D mK = new Vector3D(0, 0, 1);
-		/*private final Vector3D mU = new Vector3D();
-		private final Vector3D mV = new Vector3D();
-		private final Vector3D mW = new Vector3D();*/
 
 		@SuppressWarnings("SuspiciousNameCombination")
 		@Override
