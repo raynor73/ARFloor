@@ -32,7 +32,14 @@ public class MainActivity extends AppCompatActivity {
 	private final Scene mScene = new Scene();
 
 	private final SensorEventListener mSensorListener = new SensorEventListener() {
+		private final Vector3D mI = new Vector3D(1, 0, 0);
+		private final Vector3D mJ = new Vector3D(0, 1, 0);
+		private final Vector3D mK = new Vector3D(0, 0, 1);
+		/*private final Vector3D mU = new Vector3D();
+		private final Vector3D mV = new Vector3D();
+		private final Vector3D mW = new Vector3D();*/
 
+		@SuppressWarnings("SuspiciousNameCombination")
 		@Override
 		public void onSensorChanged(final SensorEvent event) {
 			final float sensorX;
@@ -61,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
 			}
 
 			mVectorView.setVector(-sensorX, -sensorY, -event.values[2]);
+
+			final Vector3D normalizedGravityYZ = Vector3D.normalize(new Vector3D(sensorY, event.values[2], 0));
+			final float angleX = (float) (Math.acos(Vector3D.dotProduct(normalizedGravityYZ, mI)) * 180.0f / Math.PI);
+			mScene.setCameraAngleX(-Math.signum(event.values[2]) * angleX);
+
+			final Vector3D normalizedGravityXY = Vector3D.normalize(new Vector3D(sensorY, sensorX, 0));
+			final float angleZ = (float) (Math.acos(Vector3D.dotProduct(normalizedGravityXY, mI)) * 180.0f / Math.PI);
+			mScene.setCameraAngleZ(Math.signum(sensorX) * angleZ);
 		}
 
 		@Override

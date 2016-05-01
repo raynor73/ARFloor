@@ -14,7 +14,19 @@ public class Scene implements Renderable {
 	public void setCameraAngles(final Coordinate3D angles) {
 		mCameraAngles = new Coordinate3D(angles);
 	}
-	
+
+	public void setCameraAngleX(final float angleX) {
+		mCameraAngles.setX(angleX);
+	}
+
+	public void setCameraAngleY(final float angleY) {
+		mCameraAngles.setY(angleY);
+	}
+
+	public void setCameraAngleZ(final float angleZ) {
+		mCameraAngles.setZ(angleZ);
+	}
+
 	public void setCameraPosition(final Coordinate3D position) {
 		mCameraPosition = new Coordinate3D(position);
 	}
