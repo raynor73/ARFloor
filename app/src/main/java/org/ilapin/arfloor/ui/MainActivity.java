@@ -1,4 +1,4 @@
-package org.ilapin.arfloor;
+package org.ilapin.arfloor.ui;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -19,6 +19,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+
+import org.ilapin.arfloor.R;
+import org.ilapin.arfloor.graphics.ColorMaterial;
+import org.ilapin.arfloor.graphics.Plane;
+import org.ilapin.arfloor.graphics.Scene;
+import org.ilapin.arfloor.math.Coordinate3D;
+import org.ilapin.arfloor.math.Vector3D;
+import org.ilapin.arfloor.ui.widgets.NormalizedSensorVectorView;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;

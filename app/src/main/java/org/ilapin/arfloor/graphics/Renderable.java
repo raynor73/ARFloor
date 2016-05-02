@@ -1,4 +1,4 @@
-package org.ilapin.arfloor;
+package org.ilapin.arfloor.graphics;
 
 public interface Renderable {
 

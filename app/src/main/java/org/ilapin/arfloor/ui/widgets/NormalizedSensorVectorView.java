@@ -1,4 +1,4 @@
-package org.ilapin.arfloor;
+package org.ilapin.arfloor.ui.widgets;
 
 import android.content.Context;
 import android.graphics.Canvas;

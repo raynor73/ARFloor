@@ -1,4 +1,4 @@
-package org.ilapin.arfloor;
+package org.ilapin.arfloor.math;
 
 public class Vector3D extends Coordinate3D {
 

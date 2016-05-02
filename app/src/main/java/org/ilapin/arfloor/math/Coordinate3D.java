@@ -1,4 +1,4 @@
-package org.ilapin.arfloor;
+package org.ilapin.arfloor.math;
 
 public class Coordinate3D {
 	private float mX;

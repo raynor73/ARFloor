@@ -1,6 +1,8 @@
-package org.ilapin.arfloor;
+package org.ilapin.arfloor.graphics;
 
 import android.opengl.GLES11;
+
+import org.ilapin.arfloor.math.Coordinate3D;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
