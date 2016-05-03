@@ -38,6 +38,10 @@ public class Scene implements Renderable {
 		mSceneObjects.add(sceneObject);
 	}
 
+	public void addBackgroundObject(final Renderable backgroundObject) {
+		mBackgroundObjects.add(backgroundObject);
+	}
+
 	@Override
 	public void render() {
 		final Coordinate3D cameraAngles = new Coordinate3D(mCameraAngles);

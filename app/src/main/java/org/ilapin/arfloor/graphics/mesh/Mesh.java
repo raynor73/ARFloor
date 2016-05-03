@@ -51,4 +51,20 @@ public class Mesh {
 			}
 		};
 	}
+
+	public int getNumberOfVertices() {
+		return mVertices.size();
+	}
+
+	public int getNumberOfNormals() {
+		return mNormals.size();
+	}
+
+	public int getNumberOfIndices() {
+		int numberOfIndices = 0;
+		for (final Face face : mFaces) {
+			numberOfIndices += face.getNumberOfIndexes();
+		}
+		return numberOfIndices;
+	}
 }

@@ -8,7 +8,9 @@ import android.hardware.SensorManager;
 import android.opengl.GLES11;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -21,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import org.ilapin.arfloor.R;
+import org.ilapin.arfloor.graphics.CelestialSphere;
 import org.ilapin.arfloor.graphics.ColorMaterial;
 import org.ilapin.arfloor.graphics.Plane;
 import org.ilapin.arfloor.graphics.Scene;
@@ -30,6 +33,9 @@ import org.ilapin.arfloor.ui.widgets.NormalizedSensorVectorView;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -184,6 +190,22 @@ public class MainActivity extends AppCompatActivity {
 		final Plane plane = new Plane(new ColorMaterial(0xff008000));
 		plane.setPositinon(new Coordinate3D(0, -10, 0));
 		mScene.addSceneObject(plane);
+
+		final InputStream sphereStream;
+		try {
+			sphereStream = new BufferedInputStream(getAssets().open("turned_inside_sphere_triangulated.ply"));
+		} catch (final IOException e) {
+			throw new RuntimeException(e);
+		}
+		final int celestialSphereColor = ContextCompat.getColor(this, R.color.colorPrimary);
+		final CelestialSphere celestialSphere;
+		try {
+			celestialSphere = new CelestialSphere(new ColorMaterial(celestialSphereColor), sphereStream);
+			sphereStream.close();
+		} catch (final IOException e) {
+			throw new RuntimeException(e);
+		}
+		mScene.addBackgroundObject(celestialSphere);
 	}
 
 	@Override

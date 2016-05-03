@@ -11,6 +11,7 @@ import org.smurn.jply.PlyReaderFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,9 +20,13 @@ public class MeshFactory {
 		return createFromFile(file, null);
 	}
 
-	public static Mesh createFromFile(final File file, final OnVertexAddedListener listener) throws IOException {
+	public static Mesh createFromStream(final InputStream inputStream) throws IOException {
+		return createFromStream(inputStream, null);
+	}
+
+	public static Mesh createFromStream(final InputStream inputStream, final OnVertexAddedListener listener) throws IOException {
 		final Mesh mesh = new Mesh();
-		final PlyReader plyReader = new PlyReaderFile(new FileInputStream(file));
+		final PlyReader plyReader = new PlyReaderFile(inputStream);
 		ElementReader elementReader = plyReader.nextElementReader();
 		while (elementReader != null) {
 			Element element = elementReader.readElement();
@@ -62,6 +67,10 @@ public class MeshFactory {
 		}
 
 		return mesh;
+	}
+
+	public static Mesh createFromFile(final File file, final OnVertexAddedListener listener) throws IOException {
+		return createFromStream(new FileInputStream(file), listener);
 	}
 
 	public interface OnVertexAddedListener {
