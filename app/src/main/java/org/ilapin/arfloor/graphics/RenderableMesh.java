@@ -1,7 +1,6 @@
 package org.ilapin.arfloor.graphics;
 
 import android.opengl.GLES11;
-
 import org.ilapin.arfloor.graphics.mesh.Face;
 import org.ilapin.arfloor.graphics.mesh.Mesh;
 import org.ilapin.arfloor.graphics.mesh.MeshFactory;
@@ -26,6 +25,13 @@ public class RenderableMesh implements Renderable {
 	private final FloatBuffer mVertexBuffer;
 	private final FloatBuffer mNormalBuffer;
 	private final ShortBuffer mIndexBuffer;
+
+	public RenderableMesh(final RenderableMesh source) {
+		mNumberOfVertices = source.mNumberOfVertices;
+		mVertexBuffer = source.mVertexBuffer.duplicate();
+		mNormalBuffer = source.mNormalBuffer.duplicate();
+		mIndexBuffer = source.mIndexBuffer.duplicate();
+	}
 
 	public RenderableMesh(final InputStream inputStream) throws IOException {
 		final Mesh mesh = MeshFactory.createFromStream(inputStream);

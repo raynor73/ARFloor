@@ -8,7 +8,6 @@ import android.hardware.SensorManager;
 import android.opengl.GLES11;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +20,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-
 import org.ilapin.arfloor.R;
 import org.ilapin.arfloor.graphics.CelestialSphere;
 import org.ilapin.arfloor.graphics.ColorMaterial;
@@ -191,20 +189,29 @@ public class MainActivity extends AppCompatActivity {
 		plane.setPositinon(new Coordinate3D(0, -10, 0));
 		mScene.addSceneObject(plane);
 
-		final InputStream sphereStream;
+		final InputStream turnedInsideSphereInputStream, sphereInputStream;
 		try {
-			sphereStream = new BufferedInputStream(getAssets().open("turned_inside_sphere_triangulated.ply"));
+			turnedInsideSphereInputStream =
+					new BufferedInputStream(getAssets().open("turned_inside_sphere_triangulated.ply"));
+			sphereInputStream = new BufferedInputStream(getAssets().open("sphere.ply"));
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
-		final int celestialSphereColor = ContextCompat.getColor(this, R.color.colorPrimary);
 		final CelestialSphere celestialSphere;
 		try {
-			celestialSphere = new CelestialSphere(new ColorMaterial(celestialSphereColor), sphereStream);
-			sphereStream.close();
+			celestialSphere = new CelestialSphere(turnedInsideSphereInputStream, sphereInputStream);
+			turnedInsideSphereInputStream.close();
+			sphereInputStream.close();
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		celestialSphere.setCelestialSphereMaterial(
+				new ColorMaterial(ContextCompat.getColor(this, R.color.colorPrimary))
+		);
+		celestialSphere.setNorthPoleMarkerMaterial(new ColorMaterial(0xff000080));
+		celestialSphere.setSouthPoleMarkerMaterial(new ColorMaterial(0xff800000));
+
 		mScene.addBackgroundObject(celestialSphere);
 	}
 

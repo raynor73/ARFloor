@@ -1,41 +1,51 @@
 package org.ilapin.arfloor.graphics;
 
+import android.opengl.GLES11;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 public class CelestialSphere implements Renderable {
+	private final RenderableMesh mCelestialSphere;
 	private final RenderableMesh mNorthPoleMarker;
 	private final RenderableMesh mSouthPoleMarker;
 
 	public CelestialSphere(final InputStream turnedInsideSphereInputStream, final InputStream sphereInputStream)
 			throws IOException {
-//		mNorthPoleMarker = new RenderableMesh()
+		mCelestialSphere = new RenderableMesh(turnedInsideSphereInputStream);
+		mNorthPoleMarker = new RenderableMesh(sphereInputStream);
+		mSouthPoleMarker = new RenderableMesh(mNorthPoleMarker);
 	}
 
 	public void setCelestialSphereMaterial(final Material material) {
-
+		mCelestialSphere.setMaterial(material);
 	}
 
 	public void setNorthPoleMarkerMaterial(final Material material) {
-
+		mNorthPoleMarker.setMaterial(material);
 	}
 
 	public void setSouthPoleMarkerMaterial(final Material material) {
-
+		mSouthPoleMarker.setMaterial(material);
 	}
 
 	@Override
 	public void render() {
-		/*GLES11.glPushMatrix();
+		GLES11.glPushMatrix();
 		GLES11.glScalef(1000, 1000, 1000);
-		GLES11.glEnableClientState(GLES11.GL_VERTEX_ARRAY);
+		mCelestialSphere.render();
+		GLES11.glPopMatrix();
 
-		GLES11.glVertexPointer(NUMBER_OF_VERTEX_COORDINATES, GLES11.GL_FLOAT, 0, mVertexBuffer);
-		GLES11.glNormalPointer(GLES11.GL_FLOAT, 0, mNormalBuffer);
-		mMaterial.apply();
-		GLES11.glDrawElements(GLES11.GL_TRIANGLES, mNumberOfVertices, GLES11.GL_UNSIGNED_SHORT, mIndexBuffer);
+		GLES11.glPushMatrix();
+		GLES11.glScalef(100, 100, 100);
+		GLES11.glTranslatef(-1, 1, -500);
+		mSouthPoleMarker.render();
+		GLES11.glPopMatrix();
 
-		GLES11.glDisableClientState(GLES11.GL_VERTEX_ARRAY | GLES11.GL_NORMAL_ARRAY);
-		GLES11.glPopMatrix();*/
+		GLES11.glPushMatrix();
+		GLES11.glScalef(10, 10, 10);
+		GLES11.glTranslatef(1, 1, -100);
+		mNorthPoleMarker.render();
+		GLES11.glPopMatrix();
 	}
 }
