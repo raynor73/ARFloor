@@ -37,15 +37,15 @@ public class CelestialSphere implements Renderable {
 		GLES11.glPopMatrix();
 
 		GLES11.glPushMatrix();
-		GLES11.glScalef(100, 100, 100);
-		GLES11.glTranslatef(-1, 1, -500);
-		mSouthPoleMarker.render();
+		GLES11.glTranslatef(0, 1000, 0);
+		GLES11.glScalef(50, 50, 50);
+		mNorthPoleMarker.render();
 		GLES11.glPopMatrix();
 
 		GLES11.glPushMatrix();
-		GLES11.glScalef(10, 10, 10);
-		GLES11.glTranslatef(1, 1, -100);
-		mNorthPoleMarker.render();
+		GLES11.glTranslatef(0, -1000, 0);
+		GLES11.glScalef(50, 50, 50);
+		mSouthPoleMarker.render();
 		GLES11.glPopMatrix();
 	}
 }
