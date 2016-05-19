@@ -1,13 +1,14 @@
 package org.ilapin.arfloor.common;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
 
 public class BaseObservable implements Observable {
 
-	private final Map<Observer, ExecutorService> mObservers = Maps.newHashMap();
+	private final Map<Observer, Executor> mObservers = Maps.newHashMap();
 
 	@Override
 	public void registerObserver(final Observer observer, final boolean notifyImmediately) {
@@ -16,43 +17,31 @@ public class BaseObservable implements Observable {
 
 	@Override
 	public void registerObserver(final Observer observer, final boolean notifyImmediately,
-			final ExecutorService executorService) {
-		if (mObservers.containsKey(observer)) {
-			final String message = String.format(
-					"Observable %s already contains observer %s",
-					this.toString(),
-					observer.toString()
-			);
-			throw new IllegalArgumentException(message);
-		}
-		mObservers.put(observer, executorService);
+			final Executor executor) {
+		Preconditions.checkState(!mObservers.containsKey(observer));
+
+		mObservers.put(observer, executor);
 		if (notifyImmediately) {
-			notifyObserver(observer, executorService);
+			notifyObserver(observer, executor);
 		}
 	}
 
 	@Override
 	public void unregisterObserver(final Observer observer) {
-		if (!mObservers.containsKey(observer)) {
-			final String message = String.format(
-					"Observable %s doesn't contain observer %s",
-					this.toString(),
-					observer.toString()
-			);
-			throw new IllegalArgumentException(message);
-		}
+		Preconditions.checkState(mObservers.containsKey(observer));
+
 		mObservers.remove(observer);
 	}
 
 	public void notifyObservers() {
-		for (final Map.Entry<Observer, ExecutorService> entry : mObservers.entrySet()) {
+		for (final Map.Entry<Observer, Executor> entry : mObservers.entrySet()) {
 			notifyObserver(entry.getKey(), entry.getValue());
 		}
 	}
 
-	private void notifyObserver(final Observer observer, final ExecutorService executorService) {
-		if (executorService != null) {
-			executorService.submit(new Runnable() {
+	private void notifyObserver(final Observer observer, final Executor executor) {
+		if (executor != null) {
+			executor.execute(new Runnable() {
 				@Override
 				public void run() {
 					observer.notifyChange();
