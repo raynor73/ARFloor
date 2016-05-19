@@ -2,5 +2,5 @@ package org.ilapin.arfloor.common;
 
 public interface Observer {
 
-	void notifyChanged();
+	void notifyChange();
 }
