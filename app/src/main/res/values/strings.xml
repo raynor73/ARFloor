@@ -1,3 +1,4 @@
 <resources>
 	<string name="app_name">AR Floor</string>
+	<string name="please_give_location_permission">Please, give Location permission</string>
 </resources>

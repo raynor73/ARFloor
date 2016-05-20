@@ -1,16 +1,23 @@
 package org.ilapin.arfloor.ui;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.opengl.GLES11;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -19,7 +26,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import org.ilapin.arfloor.GpsModule;
+import org.ilapin.arfloor.MainThreadExecutor;
+import org.ilapin.arfloor.ModulesHolder;
 import org.ilapin.arfloor.R;
+import org.ilapin.arfloor.common.Observer;
 import org.ilapin.arfloor.graphics.CelestialSphere;
 import org.ilapin.arfloor.graphics.ColorMaterial;
 import org.ilapin.arfloor.graphics.Plane;
@@ -34,13 +45,18 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
+	private static final int PERMISSIONS_REQUEST_CODE = 3034; // arbitrary
+
+	private final GpsModule mGpsModule = ModulesHolder.getInstance().getGpsModule();
+	private final MainThreadExecutor mMainThreadExecutor = ModulesHolder.getInstance().getMainThreadExecutor();
 
 	private SensorManager mSensorManager;
 	private Display mDisplay;
 	private NormalizedSensorVectorView mVectorView;
 
 	private final Scene mScene = new Scene();
+	private CelestialSphere mCelestialSphere;
 
 	private final SensorEventListener mSensorListener = new SensorEventListener() {
 		private final Vector3D mI = new Vector3D(1, 0, 0);
@@ -123,7 +139,41 @@ public class MainActivity extends BaseActivity {
 		}
 	};
 
-	@SuppressWarnings("ConstantConditions")
+	private final Observer mGpsModuleStateObserver = new Observer() {
+
+		@Override
+		public void notifyChange() {
+			switch (mGpsModule.getState()) {
+				case TRACKING:
+					Log.d("!@#", "TRACKING");
+					break;
+
+				case CONNECTING:
+					Log.d("!@#", "CONNECTING");
+					break;
+
+				case AWAITING_PERMISSIONS:
+					Log.d("!@#", "AWAITING_PERMISSIONS");
+					requestPermissions();
+					break;
+
+				case NOT_TRACKING:
+					Log.d("!@#", "NOT_TRACKING");
+					mGpsModule.startTracking();
+					break;
+			}
+		}
+	};
+
+	private final GpsModule.Listener mLocationListener = new GpsModule.Listener() {
+
+		@Override
+		public void onLocationReceived(final Location location) {
+			mCelestialSphere.setNorthPoleAltitude((float) location.getLatitude());
+		}
+	};
+
+	@SuppressWarnings({"ConstantConditions", "WrongConstant"})
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -196,27 +246,56 @@ public class MainActivity extends BaseActivity {
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
-		final CelestialSphere celestialSphere;
 		try {
-			celestialSphere = new CelestialSphere(turnedInsideSphereInputStream, sphereInputStream);
+			mCelestialSphere = new CelestialSphere(turnedInsideSphereInputStream, sphereInputStream);
 			turnedInsideSphereInputStream.close();
 			sphereInputStream.close();
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 
-		celestialSphere.setCelestialSphereMaterial(
+		mCelestialSphere.setCelestialSphereMaterial(
 				new ColorMaterial(ContextCompat.getColor(this, R.color.colorPrimary))
 		);
-		celestialSphere.setNorthPoleMarkerMaterial(new ColorMaterial(0xff000080));
-		celestialSphere.setSouthPoleMarkerMaterial(new ColorMaterial(0xff800000));
+		mCelestialSphere.setNorthPoleMarkerMaterial(new ColorMaterial(0xff000080));
+		mCelestialSphere.setSouthPoleMarkerMaterial(new ColorMaterial(0xff800000));
 
-		mScene.addBackgroundObject(celestialSphere);
+		mScene.addBackgroundObject(mCelestialSphere);
+	}
+
+	@Override
+	public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions,
+			@NonNull final int[] grantResults) {
+		Log.d("!@#", "onRequestPermissionsResult");
+
+		if (requestCode == PERMISSIONS_REQUEST_CODE) {
+			for (int i = 0; i < permissions.length; i++) {
+				if (permissions[i].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
+						mGpsModule.getState() == GpsModule.State.AWAITING_PERMISSIONS) {
+					if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+						mGpsModule.permissionsGranted();
+					} else {
+						requestPermissions();
+					}
+					return;
+				}
+			}
+		}
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		Log.d("!@#", "onStart");
+
+		mGpsModule.registerObserver(mGpsModuleStateObserver, true, mMainThreadExecutor);
+		mGpsModule.addListener(mLocationListener);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.d("!@#", "onResume");
 
 		final Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 		mSensorManager.registerListener(mSensorListener, sensor, SensorManager.SENSOR_DELAY_UI);
@@ -225,6 +304,30 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		Log.d("!@#", "onPause");
+
 		mSensorManager.unregisterListener(mSensorListener);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		Log.d("!@#", "onStop");
+
+		mGpsModule.unregisterObserver(mGpsModuleStateObserver);
+		if (mGpsModule.getState() == GpsModule.State.TRACKING) {
+			mGpsModule.stopTracking();
+		}
+		mGpsModule.removeListener(mLocationListener);
+	}
+
+	private void requestPermissions() {
+		if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+			ActivityCompat.requestPermissions(
+					MainActivity.this,
+					new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+					PERMISSIONS_REQUEST_CODE
+			);
+		}
 	}
 }

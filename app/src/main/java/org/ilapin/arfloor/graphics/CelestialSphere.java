@@ -10,6 +10,8 @@ public class CelestialSphere implements Renderable {
 	private final RenderableMesh mNorthPoleMarker;
 	private final RenderableMesh mSouthPoleMarker;
 
+	private volatile float mNorthPoleAltitude;
+
 	public CelestialSphere(final InputStream turnedInsideSphereInputStream, final InputStream sphereInputStream)
 			throws IOException {
 		mCelestialSphere = new RenderableMesh(turnedInsideSphereInputStream);
@@ -29,8 +31,15 @@ public class CelestialSphere implements Renderable {
 		mSouthPoleMarker.setMaterial(material);
 	}
 
+	public void setNorthPoleAltitude(final float northPoleAltitude) {
+		mNorthPoleAltitude = northPoleAltitude;
+	}
+
 	@Override
 	public void render() {
+		GLES11.glPushMatrix();
+		GLES11.glRotatef(mNorthPoleAltitude - 90, 1, 0, 0);
+
 		GLES11.glPushMatrix();
 		GLES11.glScalef(1000, 1000, 1000);
 		mCelestialSphere.render();
@@ -46,6 +55,8 @@ public class CelestialSphere implements Renderable {
 		GLES11.glTranslatef(0, -1000, 0);
 		GLES11.glScalef(50, 50, 50);
 		mSouthPoleMarker.render();
+		GLES11.glPopMatrix();
+
 		GLES11.glPopMatrix();
 	}
 }
