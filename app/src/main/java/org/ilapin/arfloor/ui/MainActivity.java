@@ -12,6 +12,7 @@ import android.opengl.GLES11;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import org.apache.commons.io.IOUtils;
 import org.ilapin.arfloor.Compass;
 import org.ilapin.arfloor.GpsModule;
 import org.ilapin.arfloor.MainThreadExecutor;
@@ -43,8 +45,11 @@ import org.ilapin.arfloor.ui.widgets.NormalizedSensorVectorView;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 	private static final int PERMISSIONS_REQUEST_CODE = 3034; // arbitrary
@@ -241,11 +246,13 @@ public class MainActivity extends AppCompatActivity {
 		plane.setPositinon(new Coordinate3D(0, -10, 0));
 		mScene.addSceneObject(plane);
 
+		final long startTime = SystemClock.elapsedRealtime();
+		Log.d("!@#", "Starting load");
 		final InputStream turnedInsideSphereInputStream, sphereInputStream;
 		try {
 			turnedInsideSphereInputStream =
-					new BufferedInputStream(getAssets().open("turned_inside_sphere_triangulated.ply"));
-			sphereInputStream = new BufferedInputStream(getAssets().open("sphere.ply"));
+					new ByteArrayInputStream(readAssetToByteArray("turned_inside_sphere_triangulated.ply"));
+			sphereInputStream = new ByteArrayInputStream(readAssetToByteArray("sphere.ply"));
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -256,6 +263,12 @@ public class MainActivity extends AppCompatActivity {
 		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
+		final String msg = String.format(
+				Locale.US,
+				"Load finished: %d ms",
+				SystemClock.elapsedRealtime() - startTime
+		);
+		Log.d("!@#", msg);
 
 		mCelestialSphere.setCelestialSphereMaterial(
 				new ColorMaterial(ContextCompat.getColor(this, R.color.colorPrimary))
@@ -326,6 +339,16 @@ public class MainActivity extends AppCompatActivity {
 			mGpsModule.stopTracking();
 		}
 		mGpsModule.removeListener(mLocationListener);
+	}
+
+	private byte[] readAssetToByteArray(final String filename) throws IOException {
+		final ByteArrayOutputStream turnedInsideSphereOutputStream = new ByteArrayOutputStream();
+		final InputStream turnedInsideSphereAssetInputStream = new BufferedInputStream(getAssets().open(filename));
+		IOUtils.copy(turnedInsideSphereAssetInputStream, turnedInsideSphereOutputStream);
+		final byte[] result = turnedInsideSphereOutputStream.toByteArray();
+		turnedInsideSphereOutputStream.close();
+		turnedInsideSphereAssetInputStream.close();
+		return result;
 	}
 
 	private void requestPermissions() {
