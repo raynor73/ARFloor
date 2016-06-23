@@ -1,0 +1,17 @@
+06-23 10:13:58.991 25766-25766/org.ilapin.arfloor E/AndroidRuntime: FATAL EXCEPTION: main
+                                                                    Process: org.ilapin.arfloor, PID: 25766
+                                                                    java.lang.IllegalStateException: NOT_TRACKING
+                                                                        at com.google.common.base.Preconditions.checkState(Preconditions.java:174)
+                                                                        at org.ilapin.arfloor.GpsModule.notifyLocation(GpsModule.java:115)
+                                                                        at org.ilapin.arfloor.GpsModule.access$600(GpsModule.java:22)
+                                                                        at org.ilapin.arfloor.GpsModule$3.onLocationChanged(GpsModule.java:67)
+                                                                        at com.google.android.gms.location.internal.zzk$zzb.handleMessage(Unknown Source)
+                                                                        at android.os.Handler.dispatchMessage(Handler.java:102)
+                                                                        at android.os.Looper.loop(Looper.java:135)
+                                                                        at android.app.ActivityThread.main(ActivityThread.java:5254)
+                                                                        at java.lang.reflect.Method.invoke(Native Method)
+                                                                        at java.lang.reflect.Method.invoke(Method.java:372)
+                                                                        at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:903)
+                                                                        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:698)
+
+

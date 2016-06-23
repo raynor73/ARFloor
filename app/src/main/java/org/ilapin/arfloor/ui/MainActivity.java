@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
+import org.ilapin.arfloor.Compass;
 import org.ilapin.arfloor.GpsModule;
 import org.ilapin.arfloor.MainThreadExecutor;
 import org.ilapin.arfloor.ModulesHolder;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
 	private final GpsModule mGpsModule = ModulesHolder.getInstance().getGpsModule();
 	private final MainThreadExecutor mMainThreadExecutor = ModulesHolder.getInstance().getMainThreadExecutor();
+
+	private Compass mCompass;
 
 	private SensorManager mSensorManager;
 	private Display mDisplay;
@@ -100,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
 			final Vector3D normalizedGravityXY = Vector3D.normalize(new Vector3D(sensorY, sensorX, 0));
 			final float angleZ = (float) (Math.acos(Vector3D.dotProduct(normalizedGravityXY, mI)) * 180.0f / Math.PI);
 			mScene.setCameraAngleZ(Math.signum(sensorX) * angleZ);
+
+			mScene.setCameraAngleY(mCompass.getAzimuth());
 		}
 
 		@Override
@@ -141,25 +146,28 @@ public class MainActivity extends AppCompatActivity {
 		}
 	};
 
-	private final Observer mGpsModuleStateObserver = () -> {
-		switch (mGpsModule.getState()) {
-			case TRACKING:
-				Log.d("!@#", "TRACKING");
-				break;
+	private final Observer mGpsModuleStateObserver = new Observer() {
+		@Override
+		public void notifyChange() {
+			switch (mGpsModule.getState()) {
+				case TRACKING:
+					Log.d("!@#", "TRACKING");
+					break;
 
-			case CONNECTING:
-				Log.d("!@#", "CONNECTING");
-				break;
+				case CONNECTING:
+					Log.d("!@#", "CONNECTING");
+					break;
 
-			case AWAITING_PERMISSIONS:
-				Log.d("!@#", "AWAITING_PERMISSIONS");
-				requestPermissions();
-				break;
+				case AWAITING_PERMISSIONS:
+					Log.d("!@#", "AWAITING_PERMISSIONS");
+					requestPermissions();
+					break;
 
-			case NOT_TRACKING:
-				Log.d("!@#", "NOT_TRACKING");
-				mGpsModule.startTracking();
-				break;
+				case NOT_TRACKING:
+					Log.d("!@#", "NOT_TRACKING");
+					mGpsModule.startTracking();
+					break;
+			}
 		}
 	};
 
@@ -180,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
 		mDisplay = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
 		mVectorView = (NormalizedSensorVectorView) findViewById(R.id.view_vector);
 		mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+		mCompass = new Compass(mSensorManager);
 
 		final SeekBar angleSeekBar = (SeekBar) findViewById(R.id.view_angle);
 		angleSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -297,6 +307,8 @@ public class MainActivity extends AppCompatActivity {
 
 		final Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
 		mSensorManager.registerListener(mSensorListener, sensor, SensorManager.SENSOR_DELAY_UI);
+
+		mCompass.start();
 	}
 
 	@Override
@@ -305,6 +317,8 @@ public class MainActivity extends AppCompatActivity {
 		Log.d("!@#", "onPause");
 
 		mSensorManager.unregisterListener(mSensorListener);
+
+		mCompass.stop();
 	}
 
 	@Override
