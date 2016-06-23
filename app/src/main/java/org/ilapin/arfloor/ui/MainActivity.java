@@ -26,7 +26,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
-
 import org.ilapin.arfloor.Compass;
 import org.ilapin.arfloor.GpsModule;
 import org.ilapin.arfloor.MainThreadExecutor;
@@ -41,12 +40,11 @@ import org.ilapin.arfloor.math.Coordinate3D;
 import org.ilapin.arfloor.math.Vector3D;
 import org.ilapin.arfloor.ui.widgets.NormalizedSensorVectorView;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 public class MainActivity extends AppCompatActivity {
 	private static final int PERMISSIONS_REQUEST_CODE = 3034; // arbitrary
@@ -104,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 			final float angleZ = (float) (Math.acos(Vector3D.dotProduct(normalizedGravityXY, mI)) * 180.0f / Math.PI);
 			mScene.setCameraAngleZ(Math.signum(sensorX) * angleZ);
 
-			mScene.setCameraAngleY(mCompass.getAzimuth());
+			mScene.setCameraAngleY(-mCompass.getAzimuth());
 		}
 
 		@Override
@@ -146,28 +144,25 @@ public class MainActivity extends AppCompatActivity {
 		}
 	};
 
-	private final Observer mGpsModuleStateObserver = new Observer() {
-		@Override
-		public void notifyChange() {
-			switch (mGpsModule.getState()) {
-				case TRACKING:
-					Log.d("!@#", "TRACKING");
-					break;
+	private final Observer mGpsModuleStateObserver = () -> {
+		switch (mGpsModule.getState()) {
+			case TRACKING:
+				Log.d("!@#", "TRACKING");
+				break;
 
-				case CONNECTING:
-					Log.d("!@#", "CONNECTING");
-					break;
+			case CONNECTING:
+				Log.d("!@#", "CONNECTING");
+				break;
 
-				case AWAITING_PERMISSIONS:
-					Log.d("!@#", "AWAITING_PERMISSIONS");
-					requestPermissions();
-					break;
+			case AWAITING_PERMISSIONS:
+				Log.d("!@#", "AWAITING_PERMISSIONS");
+				requestPermissions();
+				break;
 
-				case NOT_TRACKING:
-					Log.d("!@#", "NOT_TRACKING");
-					mGpsModule.startTracking();
-					break;
-			}
+			case NOT_TRACKING:
+				Log.d("!@#", "NOT_TRACKING");
+				mGpsModule.startTracking();
+				break;
 		}
 	};
 

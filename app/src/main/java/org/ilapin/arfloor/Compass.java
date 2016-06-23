@@ -4,7 +4,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 public class Compass {
@@ -26,6 +25,7 @@ public class Compass {
 	private final float[] mR = new float[9];
 	private final float[] mI = new float[9];
 	private final float[] mOrientation = new float[3];
+	private final float[] mCameraRotation = new float[9];
 
 	private final SensorEventListener mMagneticFieldListener = new SensorEventListener() {
 
@@ -92,7 +92,8 @@ public class Compass {
 
 	private void calculateAzimuth() {
 		if (SensorManager.getRotationMatrix(mR, mI, mAccelerometerVector, mMagneticFiledVector)) {
-			SensorManager.getOrientation(mR, mOrientation);
+			SensorManager.remapCoordinateSystem(mR, SensorManager.AXIS_X, SensorManager.AXIS_Z, mCameraRotation);
+			SensorManager.getOrientation(mCameraRotation, mOrientation);
 
 			mAzimuthStatistics.addValue(Math.toDegrees(mOrientation[0]));
 			mPitchStatistics.addValue(Math.toDegrees(mOrientation[1]));
