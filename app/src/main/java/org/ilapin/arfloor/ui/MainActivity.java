@@ -3,6 +3,7 @@ package org.ilapin.arfloor.ui;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
 	private final Scene mScene = new Scene();
 	private CelestialSphere mCelestialSphere;
 
+	private GeomagneticField mGeomagneticField;
+
 	private final SensorEventListener mSensorListener = new SensorEventListener() {
 		private final Vector3D mI = new Vector3D(1, 0, 0);
 
@@ -107,7 +110,9 @@ public class MainActivity extends AppCompatActivity {
 			final float angleZ = (float) (Math.acos(Vector3D.dotProduct(normalizedGravityXY, mI)) * 180.0f / Math.PI);
 			mScene.setCameraAngleZ(Math.signum(sensorX) * angleZ);
 
-			mScene.setCameraAngleY(-mCompass.getAzimuth());
+			if (mGeomagneticField != null) {
+				mScene.setCameraAngleY(-mCompass.getAzimuth() - mGeomagneticField.getDeclination());
+			}
 		}
 
 		@Override
@@ -175,6 +180,12 @@ public class MainActivity extends AppCompatActivity {
 
 		@Override
 		public void onLocationReceived(final Location location) {
+			mGeomagneticField = new GeomagneticField(
+					(float) location.getLatitude(),
+					(float) location.getLongitude(),
+					(float) location.getAltitude(),
+					System.currentTimeMillis()
+			);
 			mCelestialSphere.setNorthPoleAltitude((float) location.getLatitude());
 		}
 	};
